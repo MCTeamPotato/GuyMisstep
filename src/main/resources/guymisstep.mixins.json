@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "me.kall.guymisstep.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "overwrites": {
+    "conformVisibility": false
+  },
+  "minVersion": "0.8",
+  "client": [
+    "FallingBlockMixin",
+    "LocalPlayerMixin"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
