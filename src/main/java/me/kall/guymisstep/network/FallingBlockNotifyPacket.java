@@ -4,9 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FallingBlock;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
@@ -39,13 +41,13 @@ public class FallingBlockNotifyPacket {
             while (true) {
                 if (!level.isLoaded(mutablePos)) break;
 
-                var state = level.getBlockState(mutablePos);
-                var block = state.getBlock();
+                BlockState state = level.getBlockState(mutablePos);
+                Block block = state.getBlock();
                 if (state.isAir()) break;
 
                 if (!(block instanceof FallingBlock)) break;
 
-                level.scheduleTick(mutablePos, block, 1);
+                level.getBlockTicks().scheduleTick(mutablePos, block, 1);
 
                 mutablePos.move(0, -1, 0);
             }
