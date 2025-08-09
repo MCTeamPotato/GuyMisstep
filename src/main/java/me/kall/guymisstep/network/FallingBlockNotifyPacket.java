@@ -31,7 +31,7 @@ public class FallingBlockNotifyPacket {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
 
-            ServerLevel level = player.serverLevel();
+            ServerLevel level = player.getLevel();
             if (!level.isLoaded(pos)) return;
 
             BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos().set(pos);
