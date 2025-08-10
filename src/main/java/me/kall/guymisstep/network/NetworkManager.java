@@ -7,7 +7,7 @@ public final class NetworkManager {
     public static void register(RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1");
 
-        registrar.playToServer(FallingBlockNotifyPacket.TYPE, FallingBlockNotifyPacket.CODEC, FallingBlockNotifyPacket::handle);
-        registrar.playToServer(DataCleanPacket.TYPE, DataCleanPacket.CODEC, DataCleanPacket::handle);
+        registrar.playBidirectional(FallingBlockNotifyPacket.TYPE, FallingBlockNotifyPacket.CODEC, FallingBlockNotifyPacket::handle);
+        registrar.playBidirectional(DataCleanPacket.TYPE, DataCleanPacket.CODEC, DataCleanPacket::handle);
     }
 }
