@@ -2,7 +2,6 @@ package me.kall.guymisstep.mixin;
 
 import me.kall.guymisstep.api.PacketSender;
 import me.kall.guymisstep.network.FallingBlockNotifyPacket;
-import me.kall.guymisstep.network.NetworkManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -10,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,7 +34,7 @@ public abstract class FallingBlockMixin {
 
         if (distSqr < 2.25) {
             if (sender.guyMisstep$setIsSending(blockPos)) {
-                NetworkManager.INSTANCE.sendToServer(new FallingBlockNotifyPacket(pos));
+                PacketDistributor.sendToServer(new FallingBlockNotifyPacket(pos));
             }
         }
     }

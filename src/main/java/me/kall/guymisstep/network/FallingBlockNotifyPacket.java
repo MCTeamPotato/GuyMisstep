@@ -1,40 +1,40 @@
 package me.kall.guymisstep.network;
 
+import me.kall.guymisstep.GuyMisstep;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.FallingBlock;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Supplier;
-
-public class FallingBlockNotifyPacket {
-    private final BlockPos pos;
-
-    public FallingBlockNotifyPacket(BlockPos pos) {
-        this.pos = pos;
-    }
+public record FallingBlockNotifyPacket(BlockPos pos) implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, FallingBlockNotifyPacket> CODEC = CustomPacketPayload.codec(FallingBlockNotifyPacket::toBytes, FallingBlockNotifyPacket::new);
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(GuyMisstep.MOD_ID, "falling_block_notify");
+    public static final Type<FallingBlockNotifyPacket> TYPE = new Type<>(ID);
 
     public FallingBlockNotifyPacket(@NotNull FriendlyByteBuf buf) {
-        this.pos = buf.readBlockPos();
+        this(buf.readBlockPos());
     }
 
     public void toBytes(@NotNull FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
     }
 
-    public void handle(@NotNull Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
+    public static void handle(FallingBlockNotifyPacket packet, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
+            ServerPlayer player = (ServerPlayer) ctx.player();
             if (player == null) return;
 
             ServerLevel level = player.serverLevel();
-            if (!level.isLoaded(pos)) return;
+            if (!level.isLoaded(packet.pos())) return;
 
-            BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos().set(pos);
+            BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos().set(packet.pos());
 
             while (true) {
                 if (!level.isLoaded(mutablePos)) break;
@@ -50,8 +50,12 @@ public class FallingBlockNotifyPacket {
                 mutablePos.move(0, -1, 0);
             }
 
-            NetworkManager.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new DataCleanPacket(pos));
+            PacketDistributor.sendToPlayer(player, new DataCleanPacket(packet.pos()));
         });
-        ctx.get().setPacketHandled(true);
+    }
+
+    @Override
+    public @NotNull Type<FallingBlockNotifyPacket> type() {
+        return TYPE;
     }
 }

@@ -1,17 +1,13 @@
 package me.kall.guymisstep.network;
 
-import com.google.common.base.Predicates;
-import me.kall.guymisstep.GuyMisstep;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class NetworkManager {
-    public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(ResourceLocation.parse(GuyMisstep.MOD_ID + ":main"), () -> "1", Predicates.alwaysTrue(), Predicates.alwaysTrue());
-    private static int id = 0;
+    public static void register(RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("1");
 
-    public static void register() {
-        INSTANCE.registerMessage(id++, FallingBlockNotifyPacket.class, FallingBlockNotifyPacket::toBytes, FallingBlockNotifyPacket::new, FallingBlockNotifyPacket::handle);
-        INSTANCE.registerMessage(id++, DataCleanPacket.class, DataCleanPacket::toBytes, DataCleanPacket::new, DataCleanPacket::handle);
+        registrar.playToServer(FallingBlockNotifyPacket.TYPE, FallingBlockNotifyPacket.CODEC, FallingBlockNotifyPacket::handle);
+        registrar.playToServer(DataCleanPacket.TYPE, DataCleanPacket.CODEC, DataCleanPacket::handle);
     }
 }
