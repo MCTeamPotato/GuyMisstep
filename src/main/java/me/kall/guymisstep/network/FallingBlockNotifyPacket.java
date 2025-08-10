@@ -29,7 +29,6 @@ public record FallingBlockNotifyPacket(BlockPos pos) implements CustomPacketPayl
     public static void handle(FallingBlockNotifyPacket packet, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             ServerPlayer player = (ServerPlayer) ctx.player();
-            if (player == null) return;
 
             ServerLevel level = player.serverLevel();
             if (!level.isLoaded(packet.pos())) return;
