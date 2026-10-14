@@ -1,6 +1,7 @@
 package me.kall.guymisstep.mixin;
 
 import me.kall.guymisstep.api.PacketSender;
+import me.kall.guymisstep.event.PacketLimiter;
 import me.kall.guymisstep.network.FallingBlockNotifyPacket;
 import me.kall.guymisstep.network.NetworkManager;
 import net.minecraft.client.Minecraft;
@@ -21,7 +22,7 @@ public abstract class FallingBlockMixin {
     @Inject(method = "animateTick", at = @At("HEAD"))
     private void onSpawnParticle(BlockState state, Level level, BlockPos pos, Random random, CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null) return;
+        if (player == null || !PacketLimiter.tryAcquire()) return;
         long blockPos = pos.asLong();
 
         PacketSender sender = (PacketSender) player;
